@@ -1,15 +1,17 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn import datasets
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import export_graphviz
 import streamlit as st
 
-
+from PIL import Image
 
 st.title("Iris Flower Classifier")
-st.write("This is a web app that uses a machine learning model to predict the type of Iris flower type.")
+st.write("This is a web app that uses a random forest clasifier to predict the type of an Iris flower.")
+st.write("Random forest classifiers use multiple decision trees to come up with a model. Each tree outputs a prediction, and the tree with the highest accurate becomes the one our model chooses.")
 
 st.sidebar.header("User Input Paramaters:")
-
 def user_input_features():
     sepal_length = st.sidebar.slider("Sepal Length", 4.3, 7.9, 5.4)
     sepal_width = st.sidebar.slider("Sepal Width", 2.0, 4.4, 3.4)
@@ -27,7 +29,7 @@ def user_input_features():
 
 df = user_input_features()
 
-st.subheader("User Input Paramters:")
+st.subheader("Current Input Paramters:")
 st.write(df)
 
 iris_dataset = datasets.load_iris()
@@ -35,17 +37,22 @@ X = iris_dataset.data
 Y = iris_dataset.target
 
 clf = RandomForestClassifier()
-tree = clf.fit(X, Y)
+forest = clf.fit(X, Y)
 
 pred = clf.predict(df)
 pred_prob = clf.predict_proba(df)
 
-st.subheader("Class Lables + Corresponding Index:")
+st.subheader("Class Lables and their Corresponding Index:")
 st.write(iris_dataset.target_names)
 
-st.subheader("Prediction:")
-st.write(iris_dataset.target_names[pred])
+st.subheader("__Prediction:__")
+st.write(str(iris_dataset.target_names[pred])[2:-2].capitalize())
 
 st.subheader("Prediction Probability:")
 st.write(pred_prob)
+
+decision_tree_vis = Image.open("decision_tree.png")
+st.image(decision_tree_vis, caption = "The Decision Tree Used by the Classification Model", use_column_width = True)
+
+st.write("Here's the decision tree that the model created based on the training data. Go through the tree, and see how your parameters correspond to the prediction!")
 
